@@ -16,11 +16,6 @@
 						"internalType": "uint256",
 						"name": "platlim",
 						"type": "uint256"
-					},
-					{
-						"internalType": "bytes32",
-						"name": "_root",
-						"type": "bytes32"
 					}
 				],
 				"stateMutability": "nonpayable",
@@ -1373,11 +1368,11 @@
 			]
 		},
 		"contracts/royalbwp.sol": {
-			"keccak256": "0xe4433a3087b31c4d575f44277913a18f64ceb2730fe537ef3a26714b417f0801",
+			"keccak256": "0x6c43b70438098823b23debb88f3e5dd824f01d4ace948bfe5f6e01964194c06c",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a21b7dfd2324efba59734164317f4951a7999496bac317f605d7502ce57f76a2",
-				"dweb:/ipfs/QmNXzKtNqX9KrYMBEHu199gLxNqPnq5RwZerWq38yzSyGi"
+				"bzz-raw://c1f087496c6a30477f05353c18b18cb904c9fb7d458bba5ed65160027e145299",
+				"dweb:/ipfs/QmXsBjnvGoXZxGNL18N35tWUX4WC2wjgvwATpkSfLDrvKb"
 			]
 		}
 	},

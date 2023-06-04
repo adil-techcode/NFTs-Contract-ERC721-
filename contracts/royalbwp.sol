@@ -112,12 +112,11 @@ event ReservedLimitUpdated(uint phaseIndex,uint newLimit);
 
 
 
-    constructor(uint maxlim, uint platlim, bytes32 _root) ERC721("ROYAL-BWP", "RBP") {
+    constructor(uint maxlim, uint platlim) ERC721("ROYAL-BWP", "RBP") {
         totalMintingLimit = maxlim;
         platformMintingLimit = platlim;
         usersMintingLimit = totalMintingLimit - platformMintingLimit;
         currentPhase = 1;
-        root = _root;
     }
 
 
@@ -174,7 +173,7 @@ function UserMinting()  public view  returns(uint) {
   * Only  owner can call this function.
  */
 
-   function RegisterUser( UserRole  _userRole , address  _userAdd, uint _lim   ) public  onlyOwner  CheckInvalidAddress(_userAdd)    {
+   function RegisterUser( UserRole  _userRole , address  _userAdd, uint _lim   ) public  onlyOwner  whenNotPaused  CheckInvalidAddress(_userAdd)    {
 
  // Check the user is not already registered as a Premium  or Normal  user 
     require(_UserList[msg.sender].userAdd !=  _userAdd , "User Already Registered"); 
@@ -211,7 +210,7 @@ function UserMinting()  public view  returns(uint) {
  * @param add address of  Premium user to  verified.
  * User Registration Required
  */
-function VerifyPermiumUser(address add) public onlyOwner  RegistrationRequired(add) {
+function VerifyPermiumUser(address add) public onlyOwner  whenNotPaused  RegistrationRequired(add) {
 
    if(_UserList[add].role == UserRole.Premium){
     // Check if the user is not already verified
@@ -245,7 +244,7 @@ function VerifyPermiumUser(address add) public onlyOwner  RegistrationRequired(a
  */
 
 
-function createPhase(uint _reservedLimit, uint _permiumLimit, uint _normalLimit) public onlyOwner {
+function createPhase(uint _reservedLimit, uint _permiumLimit, uint _normalLimit) public  whenNotPaused onlyOwner {
   
     // Check the current phase is not already active
     require(!_Phases[currentPhase].isActive, "Current phase is already active.");
@@ -286,7 +285,7 @@ function createPhase(uint _reservedLimit, uint _permiumLimit, uint _normalLimit)
  * @dev Activates the current phase.
   * Only  owner can call this function.
  */
-function activePhase() public onlyOwner {
+function activePhase() public onlyOwner whenNotPaused {
     // Ensure the current phase is not already active
     require(!_Phases[currentPhase].isActive, "Phase is already active.");
     
@@ -314,7 +313,7 @@ function activePhase() public onlyOwner {
  * @dev Deactivates the current phase and advances to the next phase.
   * Only  owner can call this function.
  */
-function deactivatePhase() public onlyOwner {
+function deactivatePhase() public onlyOwner whenNotPaused {
     // Ensure the current phase is active
     require(_Phases[currentPhase].isActive, "Phase is not active.");
     
@@ -347,7 +346,7 @@ function deactivatePhase() public onlyOwner {
   * User Address Registration Required.
   
  */
-function updateUserGlobalLimit(address _add, uint limit) public onlyOwner  RegistrationRequired(_add) {
+function updateUserGlobalLimit(address _add, uint limit) public whenNotPaused onlyOwner  RegistrationRequired(_add) {
     // Ensure that the provided limit is greater than the user's balance
     require(limit > balanceOf(_add), "The limit must exceed the user's balance.");
 
@@ -375,7 +374,7 @@ function updateUserGlobalLimit(address _add, uint limit) public onlyOwner  Regis
  * @param _lim The new reserved limit to be set.
   * Only  owner can call this function.
  */
-function UpdateReservedLimit(uint _lim) public onlyOwner {
+function UpdateReservedLimit(uint _lim) public  whenNotPaused onlyOwner {
     // Ensure that the current phase is active
     require(_Phases[currentPhase].isActive, "Phase Not Active");
     
@@ -401,13 +400,13 @@ function UpdateReservedLimit(uint _lim) public onlyOwner {
  * @param to .
  * @param tokenId .
  */
-// function _transfer(address from, address to, uint256 tokenId) internal override(ERC721) {
-//     // Check if transfer is currently allowed
-//     require(isTransferable, "Transfer is deactivated");
+function _transfer(address from, address to, uint256 tokenId) whenNotPaused internal override(ERC721) {
+    // Check if transfer is currently allowed
+    require(isTransferable, "Transfer is deactivated");
 
-//     // Call the base ERC721 _transfer function
-//     super._transfer(from, to, tokenId);
-// }
+    // Call the base ERC721 _transfer function
+    super._transfer(from, to, tokenId);
+}
 
 
 
@@ -418,7 +417,7 @@ function UpdateReservedLimit(uint _lim) public onlyOwner {
  * @dev allowTransfer() Allows token transfers. Only the contract owner can call this function.
  *  error if transfers are already allowed.
  */
-function allowTransfer() public onlyOwner {
+function allowTransfer() public whenNotPaused onlyOwner {
     // Check if transfers are already allowed
     require(!isTransferable, "Already Allowed!");
 
@@ -482,7 +481,7 @@ function _validateTokenId(uint tokenId) internal view returns (bool) {
  * @param tokenId The ID of the token to be minted.
  *  User Registration Required
  */
-function safeMint(address to, string memory uri, uint tokenId) public  CheckInvalidAddress(to) RegistrationRequired(msg.sender)  {
+function safeMint(address to, string memory uri, uint tokenId) public whenNotPaused CheckInvalidAddress(to) RegistrationRequired(msg.sender)  {
    
     // Check if the current phase is active
     require(_Phases[currentPhase].isActive, "Phase is Not active or Created!");
@@ -560,7 +559,7 @@ function safeMint(address to, string memory uri, uint tokenId) public  CheckInva
  * @param nftsArray An array of NFTBatch struct representing the NFTs to be minted.
  * Sender Registrayion Required
  */
-function mintBulkNfts(NFTBatch[] memory nftsArray) public  RegistrationRequired(msg.sender)  {
+function mintBulkNfts(NFTBatch[] memory nftsArray) public whenNotPaused   RegistrationRequired(msg.sender)  {
   
     // Check if the current phase is active
     require(_Phases[currentPhase].isActive, "Phase is Not active or Created!");
@@ -636,7 +635,7 @@ function mintBulkNfts(NFTBatch[] memory nftsArray) public  RegistrationRequired(
  * Only the addresses listed as admins can call this function.
  * @param _nftsArray An array of NFTBatch struct representing the NFTs to be minted.
  */
-function AdminMint(NFTBatch[] memory _nftsArray) public {
+function AdminMint(NFTBatch[] memory _nftsArray)  whenNotPaused public {
     // Check if the caller is listed as an admin
     require(_AdminsList[msg.sender], "Only Admins can Mint NFTs");
 
@@ -662,7 +661,7 @@ function AdminMint(NFTBatch[] memory _nftsArray) public {
  * @dev Update the token URI for multiple NFTs in bulk.
  * @param _array An array of NFTMetadata struct representing the NFTs to be updated.
  */
-function updateBulkNfts(NFTMetadata[] memory _array) public {
+function updateBulkNfts(NFTMetadata[] memory _array)  whenNotPaused public {
     for (uint i = 0; i < _array.length; i++) {
         // Check if the caller owns the NFT
         if (ownerOf(_array[i].token_id) == msg.sender) {
@@ -763,7 +762,7 @@ function unpause() public onlyOwner {
         whenNotPaused
         override(ERC721, ERC721Enumerable)
     {
-            require(isTransferable, "Transfer is deactivated");
+            // require(isTransferable, "Transfer is deactivated");
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
